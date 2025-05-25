@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Responder Enquete: {{ enquete.titulo }}{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Responder Enquete: {{ enquete.titulo }}</h1>
+
+<form method="post" class="card p-4 shadow-sm">
+    {% csrf_token %}
+
+    <div class="form-group">
+        {% if user.is_authenticated %}
+            <p>Você está respondendo como: <strong>{{ user.username }}</strong></p>
+            {{ resposta_form.aluno.as_hidden }} {# Oculta o campo aluno, pois já sabemos quem é #}
+        {% else %}
+            <label for="{{ resposta_form.identificador_anonimo.id_for_label }}">Identificador Anônimo (opcional):</label>
+            {{ resposta_form.identificador_anonimo }}
+            <small class="form-text text-muted">Use um nome ou código para identificar sua resposta anonimamente.</small>
+        {% endif %}
+    </div>
+
+    {% for questao in questoes_forms %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ forloop.counter }}. {{ questao.instance.texto_questao }}</h5>
+                {% if questao.instance.tipo_questao == 'texto' %}
+                    <div class="form-group">
+                        {{ questao.item_form.texto_resposta.label_tag }}
+                        {{ questao.item_form.texto_resposta }}
+                        {% if questao.item_form.texto_resposta.errors %}
+                            {% for error in questao.item_form.texto_resposta.errors %}
+                                <div class="alert alert-danger mt-1">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% elif questao.instance.tipo_questao == 'multipla_escolha' %}
+                    <div class="form-group">
+                        <p>Selecione uma ou mais opções:</p>
+                        {% for choice in questao.item_form.opcoes_selecionadas.field.choices %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="{{ questao.item_form.opcoes_selecionadas.html_name }}" id="checkbox-{{ questao.instance.id }}-{{ choice.0 }}" value="{{ choice.0 }}">
+                                <label class="form-check-label" for="checkbox-{{ questao.instance.id }}-{{ choice.0 }}">
+                                    {{ choice.1 }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                        {% if questao.item_form.opcoes_selecionadas.errors %}
+                            {% for error in questao.item_form.opcoes_selecionadas.errors %}
+                                <div class="alert alert-danger mt-1">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% elif questao.instance.tipo_questao == 'unica_escolha' %}
+                    <div class="form-group">
+                        <p>Selecione apenas uma opção:</p>
+                        {% for choice in questao.item_form.opcao_selecionada.field.choices %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="{{ questao.item_form.opcao_selecionada.html_name }}" id="radio-{{ questao.instance.id }}-{{ choice.0 }}" value="{{ choice.0 }}">
+                                <label class="form-check-label" for="radio-{{ questao.instance.id }}-{{ choice.0 }}">
+                                    {{ choice.1 }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                        {% if questao.item_form.opcao_selecionada.errors %}
+                            {% for error in questao.item_form.opcao_selecionada.errors %}
+                                <div class="alert alert-danger mt-1">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-success mt-3">Finalizar Resposta</button>
+    <a href="{% url 'enquete_list' %}" class="btn btn-secondary mt-3 ml-2">Cancelar</a>
+</form>
+{% endblock %}

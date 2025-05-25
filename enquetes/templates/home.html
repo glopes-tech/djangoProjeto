@@ -1,0 +1,15 @@
+{% extends 'base.html' %} 
+{% block title %}Página Inicial - Enquetes{% endblock %}
+
+{% block content %}
+    <h1 class="display-4 mb-4">Bem-vindo ao Enquetes para Programadores!</h1>
+    <p class="lead">Hoje é: {{ now|date:"d/m/Y H:i" }}</p>
+    <p>Use os links abaixo para navegar nas funcionalidades:</p>
+    <ul class="list-unstyled">
+        <li><a href="{% url 'enquete_list' %}" class="btn btn-primary btn-lg btn-block mb-2">Ver e Responder Enquetes</a></li>
+        <li><a href="{% url 'admin:index' %}" class="btn btn-success btn-lg btn-block mb-2">Administração do Site</a></li>
+        {# Os links abaixo são placeholders. Você precisará criar as URLs e views correspondentes. #}
+        <li><a href="#" class="btn btn-info btn-lg btn-block mb-2 disabled">Gerenciar Usuários (Ajustar URL)</a></li>
+        <li><a href="#" class="btn btn-secondary btn-lg btn-block mb-2 disabled">Listar Áreas de Interesse (Ajustar URL)</a></li>
+    </ul>
+{% endblock %}

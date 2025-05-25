@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhes da Enquete: {{ enquete.titulo }}{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Detalhes da Enquete</h1>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h2>{{ enquete.titulo }}</h2>
+    </div>
+    <div class="card-body">
+        <p class="card-text"><strong>Descrição:</strong> {{ enquete.descricao }}</p>
+        <p class="card-text"><strong>Início:</strong> {{ enquete.data_inicio|date:"d/m/Y H:i" }}</p>
+        <p class="card-text"><strong>Fim:</strong> {{ enquete.data_fim|date:"d/m/Y H:i" }}</p>
+        <p class="card-text"><strong>Criado por:</strong> {{ enquete.criador.get_full_name|default:enquete.criador.username }}</p>
+        <p class="card-text"><strong>Status:</strong>
+            {% if enquete.esta_aberta %}
+                <span class="badge badge-success">Aberta</span>
+            {% else %}
+                <span class="badge badge-warning">Fechada</span>
+            {% endif %}
+        </p>
+
+        {% if enquete.questao_set.all %}
+            <h4 class="mt-4">Questões:</h4>
+            <ul class="list-group">
+                {% for questao in enquete.questao_set.all %}
+                    <li class="list-group-item">
+                        <p class="mb-1"><strong>{{ questao.ordem }}. {{ questao.texto_questao }}</strong> ({{ questao.get_tipo_questao_display }})</p>
+                        {% if questao.opcaoresposta_set.all %}
+                            <p class="mb-1">Opções:</p>
+                            <ul>
+                                {% for opcao in questao.opcaoresposta_set.all %}
+                                    <li>{{ opcao.texto_opcao }} (Votos: {{ opcao.contador_votos }})</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="alert alert-info">Nenhuma questão adicionada a esta enquete ainda.</p>
+        {% endif %}
+    </div>
+    <div class="card-footer">
+        <a href="{% url 'enquete_update' enquete.id %}" class="btn btn-warning btn-sm">Editar Enquete</a>
+        <a href="{% url 'enquete_delete' enquete.id %}" class="btn btn-danger btn-sm">Excluir Enquete</a>
+        {% if enquete.esta_aberta %}
+            <a href="{% url 'enquete_responder' enquete.id %}" class="btn btn-success btn-sm ml-2">Responder Enquete</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

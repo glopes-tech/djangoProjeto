@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Enquetes{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Enquetes Disponíveis</h1>
+
+{% if enquetes %}
+    <div class="list-group">
+        {% for enquete in enquetes %} {# Loop #}
+            <a href="{% url 'enquete_detail' enquete.id %}" class="list-group-item list-group-item-action">
+                <h5 class="mb-1">{{ enquete.titulo|title }}</h5> {# Filtro 1: title #}
+                <p class="mb-1">{{ enquete.descricao|truncatechars:100 }}</p> {# Filtro 2: truncatechars #}
+                <small class="text-muted">
+                    Início: {{ enquete.data_inicio|date:"d/m/Y H:i" }} | Fim: {{ enquete.data_fim|date:"d/m/Y H:i" }}
+                    {% if enquete.esta_aberta %} {# Condicional #}
+                        <span class="badge badge-success ml-2">Aberta</span>
+                    {% else %}
+                        <span class="badge badge-warning ml-2">Fechada</span>
+                    {% endif %}
+                </small>
+            </a>
+        {% empty %}
+            <p class="alert alert-info">Nenhuma enquete disponível no momento.</p>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="alert alert-info">Nenhuma enquete encontrada.</p>
+{% endif %}
+
+<a href="{% url 'enquete_create' %}" class="btn btn-primary mt-4">Criar Nova Enquete</a>
+{% endblock %}
